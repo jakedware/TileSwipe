@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.tileswipe;
 
 import android.content.Context;
 
