@@ -13,6 +13,8 @@ public class PuzzleTile {
     protected static final Path.Direction TILE_DIRECTION = Path.Direction.CW;
     private Path tilePath;
     private Paint tilePaint;
+    protected float posX;
+    protected float posY;
     private boolean isEmpty = false;
     protected Matrix matrix;
 
@@ -42,5 +44,18 @@ public class PuzzleTile {
 
     public boolean isEmpty() {
         return isEmpty;
+    }
+
+    public void setPos(float x, float y) {
+        posX = x;
+        posY = y;
+    }
+
+    public void moveX (float delta) {
+        posX += delta;
+    }
+
+    public void moveY (float delta) {
+        posY += delta;
     }
 }
