@@ -26,6 +26,8 @@ public class PuzzleView extends View {
     VelocityTracker mVelocityTracker;
     private int gridIndexX = -1;
     private int gridIndexY = -1;
+    private int outOfPlaceIndexX = -1;
+    private int outOfPlaceIndexY = -1;
     private float previousX = -1f;
     private float previousY = -1f;
     private float firstX = -1f;
@@ -110,12 +112,13 @@ public class PuzzleView extends View {
 
                 if (tileIsOutOfPlace) {
                     Log.d("onTouchEvent()", "tile is out of place");
-                    if (myPuzzleGrid.isTouchOnTile(x, y, gridIndexX , gridIndexY)) {
+                    if (myPuzzleGrid.isTouchOnTile(x, y, outOfPlaceIndexX, outOfPlaceIndexY)) {
                         Log.d("onTouchEvent()","moving tile at " + x + "," + y);
+                        gridIndexX = outOfPlaceIndexX;
+                        gridIndexY = outOfPlaceIndexY;
                         break;
                         //moveTile(x, y);
                     }
-
                 }
 
                 gridIndexX = i;
@@ -152,6 +155,9 @@ public class PuzzleView extends View {
             Log.d("PuzzleView.onDown()", "outside grid");
             return false;
         }
+        if (tileIsOutOfPlace && (outOfPlaceIndexY != gridIndexY || outOfPlaceIndexX != gridIndexX)) {
+            return false;
+        }
         float deltaX = x - previousX;
         float deltaY = y - previousY;
         //Log.d("onTouchEvent()", "deltaX: " + deltaX + ", deltaY: " + deltaY);
@@ -165,6 +171,8 @@ public class PuzzleView extends View {
                 previousX = x;
                 previousY = y;
                 tileIsOutOfPlace = true;
+                outOfPlaceIndexX = gridIndexX;
+                outOfPlaceIndexY = gridIndexY;
                 invalidate();
                 break;
             case PuzzleGrid.TILE_NEW_LOCATION:
