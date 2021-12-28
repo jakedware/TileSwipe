@@ -30,6 +30,7 @@ public class PuzzleView extends View {
     private float previousY = -1f;
     private float firstX = -1f;
     private float firstY = -1f;
+    private boolean tileIsOutOfPlace;
     PuzzleGrid myPuzzleGrid;
 
     public PuzzleView(Context context, int displayWidth, int displayHeight, Resources.Theme theme) {
@@ -95,48 +96,38 @@ public class PuzzleView extends View {
                 if (innerX <= 0 || innerY <= 0) {
                     Log.d("PuzzleView.onDown()", "outside grid");
                 }
-                gridIndexX  = (int) (innerX / tileWidth);
-                gridIndexY = (int) (innerY / tileHeight);
 
-                if (gridIndexX >= numTilesX || gridIndexY >= numTilesY) {
+                int i = (int) (innerX / tileWidth);
+                int j = (int) (innerY / tileHeight);
+
+                if (i >= numTilesX || j >= numTilesY) {
                     Log.d("PuzzleView.onDown()", "outside grid");
                     break;
                 }
 
-                firstX = x;
-                firstY = y;
                 previousX = x;
                 previousY = y;
+
+                if (tileIsOutOfPlace) {
+                    Log.d("onTouchEvent()", "tile is out of place");
+                    if (myPuzzleGrid.isTouchOnTile(x, y, gridIndexX , gridIndexY)) {
+                        Log.d("onTouchEvent()","moving tile at " + x + "," + y);
+                        break;
+                        //moveTile(x, y);
+                    }
+
+                }
+
+                gridIndexX = i;
+                gridIndexY = j;
+                firstX = x;
+                firstY = y;
                 Log.d("PuzzleView.onDown()", String.format("[%d][%d]", gridIndexX, gridIndexY));
-
-
 
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (gridIndexX == numTilesX || gridIndexY == numTilesY) {
-                    Log.d("PuzzleView.onDown()", "outside grid");
-                    break;
+                if (moveTile(event.getX(), event.getY())) {
                 }
-                x = event.getX();
-                y = event.getY();
-                float deltaX = x - previousX;
-                float deltaY = y - previousY;
-                Log.d("onTouchEvent()", "deltaX: " + deltaX + ", deltaY: " + deltaY);
-                Log.d("onTouchEvent()", "gridIndexX: " + gridIndexX + " gridIndexY: " + gridIndexY);
-
-                switch (myPuzzleGrid.tryToMoveTile(gridIndexX, gridIndexY, firstX, firstY, deltaX, deltaY, x, y)) {
-                    case PuzzleGrid.TILE_MOVED:
-                        previousX = x;
-                        previousY = y;
-                        invalidate();
-                        break;
-                    case PuzzleGrid.TILE_NEW_LOCATION:
-                        invalidate();
-                        break;
-                    case PuzzleGrid.TILE_NOT_MOVED:
-                        break;
-                }
-
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
@@ -154,5 +145,35 @@ public class PuzzleView extends View {
                 canvas.drawPath(currTile.getTilePath(), currTile.getTilePaint());
             }
         }
+    }
+
+    public boolean moveTile(float x, float y) {
+        if (gridIndexX == numTilesX || gridIndexY == numTilesY) {
+            Log.d("PuzzleView.onDown()", "outside grid");
+            return false;
+        }
+        float deltaX = x - previousX;
+        float deltaY = y - previousY;
+        //Log.d("onTouchEvent()", "deltaX: " + deltaX + ", deltaY: " + deltaY);
+        if (deltaX == 0 && deltaY == 0) {
+            return false;
+        }
+        //Log.d("onTouchEvent()", "gridIndexX: " + gridIndexX + " gridIndexY: " + gridIndexY);
+
+        switch (myPuzzleGrid.tryToMoveTile(gridIndexX, gridIndexY, firstX, firstY, deltaX, deltaY, x, y)) {
+            case PuzzleGrid.TILE_MOVED:
+                previousX = x;
+                previousY = y;
+                tileIsOutOfPlace = true;
+                invalidate();
+                break;
+            case PuzzleGrid.TILE_NEW_LOCATION:
+                tileIsOutOfPlace = false;
+                invalidate();
+                break;
+            case PuzzleGrid.TILE_NOT_MOVED:
+                break;
+        }
+        return true;
     }
 }

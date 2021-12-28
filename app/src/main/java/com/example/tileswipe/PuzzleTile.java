@@ -16,6 +16,7 @@ public class PuzzleTile {
     protected float posX;
     protected float posY;
     private boolean isEmpty = false;
+    private boolean isMoving = false;
     protected Matrix matrix;
 
     public PuzzleTile(float tileWidth, float tileHeight) {
@@ -57,5 +58,17 @@ public class PuzzleTile {
 
     public void moveY (float delta) {
         posY += delta;
+    }
+
+    public void startMoving() {
+        isMoving = true;
+    }
+
+    public void stopMoving() {
+        isMoving = false;
+    }
+
+    public boolean isMoving() {
+        return isMoving;
     }
 }
