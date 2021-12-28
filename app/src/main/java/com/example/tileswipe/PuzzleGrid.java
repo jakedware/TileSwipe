@@ -20,8 +20,11 @@ public class PuzzleGrid {
     protected static final int TILE_NOT_MOVED = 0;
     protected static final int TILE_MOVED = 1;
     protected static final int TILE_NEW_LOCATION = 2;
+    protected static final int TILE_OLD_LOCATION = 3;
     protected PuzzleTile[][] puzzleGrid;
     protected float[][][] gridCoords;
+    protected int previousEmptyX;
+    protected int previousEmptyY;
     protected int emptyX;
     protected int emptyY;
     protected int numX;
@@ -65,6 +68,8 @@ public class PuzzleGrid {
         puzzleGrid[emptyX][emptyY].getTilePath().transform(movedTileMatrix);
         puzzleGrid[emptyX][emptyY].setPos(gridCoords[emptyX][emptyY][0], gridCoords[emptyX][emptyY][1]);
 
+        previousEmptyX = emptyX;
+        previousEmptyY = emptyY;
         emptyX = i;
         emptyY = j;
     }
@@ -165,7 +170,7 @@ public class PuzzleGrid {
                     }
                     else {
                         returnTileToGridPosition(i, j);
-                        return TILE_NEW_LOCATION;
+                        return TILE_OLD_LOCATION;
                     }
                 case MOVEMENT_RANGE_UNDER:
                     if (movementRange[1] == movementRangeZero) {
@@ -174,7 +179,7 @@ public class PuzzleGrid {
                     }
                     else {
                         returnTileToGridPosition(i, j);
-                        return TILE_NEW_LOCATION;
+                        return TILE_OLD_LOCATION;
                     }
             }
         }
@@ -199,7 +204,7 @@ public class PuzzleGrid {
                     }
                     else {
                         returnTileToGridPosition(i, j);
-                        return TILE_NEW_LOCATION;
+                        return TILE_OLD_LOCATION;
                     }
                 case MOVEMENT_RANGE_UNDER:
                     if (movementRange[1] == movementRangeZero) {
@@ -208,11 +213,15 @@ public class PuzzleGrid {
                     }
                     else {
                         returnTileToGridPosition(i, j);
-                        return TILE_NEW_LOCATION;
+                        return TILE_OLD_LOCATION;
                     }
             }
         }
 
         return TILE_NOT_MOVED;
+    }
+
+    public int[] getPreviousEmptyIndices() {
+        return new int[] {previousEmptyX, previousEmptyY};
     }
 }

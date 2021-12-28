@@ -158,13 +158,14 @@ public class PuzzleView extends View {
         if (tileIsOutOfPlace && (outOfPlaceIndexY != gridIndexY || outOfPlaceIndexX != gridIndexX)) {
             return false;
         }
+
         float deltaX = x - previousX;
         float deltaY = y - previousY;
         //Log.d("onTouchEvent()", "deltaX: " + deltaX + ", deltaY: " + deltaY);
         if (deltaX == 0 && deltaY == 0) {
             return false;
         }
-        //Log.d("onTouchEvent()", "gridIndexX: " + gridIndexX + " gridIndexY: " + gridIndexY);
+        Log.d("onTouchEvent()", "gridIndexX: " + gridIndexX + " gridIndexY: " + gridIndexY);
 
         switch (myPuzzleGrid.tryToMoveTile(gridIndexX, gridIndexY, firstX, firstY, deltaX, deltaY, x, y)) {
             case PuzzleGrid.TILE_MOVED:
@@ -176,6 +177,10 @@ public class PuzzleView extends View {
                 invalidate();
                 break;
             case PuzzleGrid.TILE_NEW_LOCATION:
+                int[] emptyIndices = myPuzzleGrid.getPreviousEmptyIndices();
+                gridIndexX = emptyIndices[0];
+                gridIndexY = emptyIndices[1];
+            case PuzzleGrid.TILE_OLD_LOCATION:
                 tileIsOutOfPlace = false;
                 invalidate();
                 break;
