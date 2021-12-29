@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Tile Swipe</string>
+    <string name="back_dialog_positive_button">CONFIRM</string>
+    <string name="back_dialog_negative_button">CANCEL</string>
+    <string name="back_dialog_title">Are you sure you want to go back?</string>
+    <string name="back_dialog_message">Progress will be lost.</string>
 </resources>

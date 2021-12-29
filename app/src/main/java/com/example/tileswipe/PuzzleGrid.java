@@ -12,10 +12,6 @@ public class PuzzleGrid {
     protected static final int MOVEMENT_RANGE_WITHIN = 0;
     protected static final int MOVEMENT_RANGE_OVER = 1;
     protected static final int MOVE_NO_WHERE = -1;
-    protected static final int MOVE_UP = 0;
-    protected static final int MOVE_DOWN = 1;
-    protected static final int MOVE_LEFT = 2;
-    protected static final int MOVE_RIGHT = 3;
     protected static final int MOVE_REVERSE = 4;
     protected static final int TILE_NOT_MOVED = 0;
     protected static final int TILE_MOVED = 1;
@@ -52,7 +48,7 @@ public class PuzzleGrid {
         currTile.setPos(gridCoords[i][j][0], gridCoords[i][j][1]);
     }
 
-    private void switchMovingWithEmpty(int i, int j) {
+    protected void switchMovingWithEmpty(int i, int j) {
         Log.d("tryToMoveTile()", "tile in new location");
         PuzzleTile emptyTile = puzzleGrid[emptyX][emptyY];
         puzzleGrid[emptyX][emptyY] = puzzleGrid[i][j];

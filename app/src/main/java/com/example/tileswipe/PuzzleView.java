@@ -9,8 +9,15 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.widget.Toast;
+
+import java.util.Random;
 
 public class PuzzleView extends View {
+    protected static final int MOVE_UP = 0;
+    protected static final int MOVE_DOWN = 1;
+    protected static final int MOVE_LEFT = 2;
+    protected static final int MOVE_RIGHT = 3;
     float displayWidth;
     float displayHeight;
     float numTilesX;
@@ -55,7 +62,7 @@ public class PuzzleView extends View {
         puzzleGrid = myPuzzleGrid.puzzleGrid;
         for (int i = 0; i < puzzleGrid.length; i++) {
             for (int j = 0; j < puzzleGrid[i].length; j++) {
-                PuzzleTile currTile = new PuzzleTile(tileWidth, tileHeight);
+                PuzzleTile currTile = new PuzzleTile(tileWidth, tileHeight, (int) (j * numTilesX + i + 1));
 
                 Matrix matrix = new Matrix();
                 gridCoords[i][j] = new float[]{puzzleBorder.thicknessX + (i * tileWidth), puzzleBorder.thicknessY + (j * tileHeight)};
@@ -71,6 +78,7 @@ public class PuzzleView extends View {
             }
         }
 
+        scramblePuzzle();
     }
 
     @Override
@@ -146,6 +154,10 @@ public class PuzzleView extends View {
             for(int j = 0; j < puzzleGrid[i].length; j++) {
                 PuzzleTile currTile = puzzleGrid[i][j];
                 canvas.drawPath(currTile.getTilePath(), currTile.getTilePaint());
+                if (!currTile.isEmpty()) {
+                    canvas.drawText("" + currTile.getNumber(), currTile.posX + tileWidth / 2, currTile.posY + tileHeight / 2, currTile.getTextPaint());
+                    //canvas.drawTextOnPath("" + currTile.getNumber(), currTile.getTilePath(), tileWidth / 2 , tileHeight / 2,currTile.getTextPaint());
+                }
             }
         }
     }
@@ -180,6 +192,12 @@ public class PuzzleView extends View {
                 int[] emptyIndices = myPuzzleGrid.getPreviousEmptyIndices();
                 gridIndexX = emptyIndices[0];
                 gridIndexY = emptyIndices[1];
+
+                if (isPuzzleSolved()) {
+                    Toast toast = Toast.makeText(getContext(), "Puzzle solved!", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                Log.d("isPuzzleSolved()", "" + isPuzzleSolved());
             case PuzzleGrid.TILE_OLD_LOCATION:
                 tileIsOutOfPlace = false;
                 invalidate();
@@ -188,5 +206,88 @@ public class PuzzleView extends View {
                 break;
         }
         return true;
+    }
+
+    public boolean isPuzzleSolved() {
+        for (int i = 0; i < puzzleGrid.length; i++) {
+            for (int j = 0; j < puzzleGrid[i].length; j++) {
+                if (puzzleGrid[i][j].getNumber() != (j * numTilesX + i + 1)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void scramblePuzzle() {
+        int N = (int) (100 * numTilesX * numTilesY);
+        int move = -1;
+        for (int i = 0; i < N; i++) {
+            move = getRandomScrambleMove(move);
+
+            while (!isScrambleMoveValid(move)) {
+                move = getRandomScrambleMove(move);
+            }
+
+            switch (move) {
+                case MOVE_UP:
+                    myPuzzleGrid.switchMovingWithEmpty(myPuzzleGrid.emptyX, myPuzzleGrid.emptyY - 1);
+                    break;
+                case MOVE_DOWN:
+                    myPuzzleGrid.switchMovingWithEmpty(myPuzzleGrid.emptyX, myPuzzleGrid.emptyY + 1);
+                    break;
+                case MOVE_LEFT:
+                    myPuzzleGrid.switchMovingWithEmpty(myPuzzleGrid.emptyX - 1, myPuzzleGrid.emptyY);
+                    break;
+                case MOVE_RIGHT:
+                    myPuzzleGrid.switchMovingWithEmpty(myPuzzleGrid.emptyX + 1, myPuzzleGrid.emptyY);
+                    break;
+
+            }
+        }
+    }
+
+    public boolean isScrambleMoveValid(int move) {
+        int x = myPuzzleGrid.emptyX;
+        int y = myPuzzleGrid.emptyY;
+
+        switch (move) {
+            case MOVE_UP:
+                if (y - 1 < 0) {
+                    return false;
+                }
+                break;
+            case MOVE_DOWN:
+                if (y + 1 >= numTilesY) {
+                    return false;
+                }
+                break;
+            case MOVE_LEFT:
+                if (x - 1 < 0) {
+                    return false;
+                }
+                break;
+            case MOVE_RIGHT:
+                if (x + 1 >= numTilesX) {
+                    return false;
+                }
+                break;
+        }
+
+        return true;
+    }
+
+    public int getRandomScrambleMove(int lastMove) {
+        Random random = new Random();
+        int[][] moves = new int[][] {{MOVE_UP, MOVE_DOWN}, {MOVE_LEFT, MOVE_RIGHT}};
+        int randomI = random.nextInt(moves[0].length);
+        int randomJ = random.nextInt(moves[1].length);
+
+        while (lastMove == moves[randomI][randomJ]) {
+            randomI = random.nextInt(moves[0].length);
+            randomJ = random.nextInt(moves[0].length);
+        }
+
+        return moves[randomI][randomJ];
     }
 }
