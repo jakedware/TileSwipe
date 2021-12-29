@@ -18,6 +18,7 @@ public class PuzzleView extends View {
     protected static final int MOVE_DOWN = 1;
     protected static final int MOVE_LEFT = 2;
     protected static final int MOVE_RIGHT = 3;
+    private final int NUM_GRID_SCRAMBLES = 100;
     float displayWidth;
     float displayHeight;
     float numTilesX;
@@ -50,6 +51,7 @@ public class PuzzleView extends View {
         this.displayHeight = displayHeight;
         numTilesY = 6;
         numTilesX = 4;
+
 
         tileWidth = displayWidth * (1 - 2 * PuzzleBorder.BORDER_PERCENT) / numTilesX;
         tileHeight = displayHeight * (1 - 2 * PuzzleBorder.BORDER_PERCENT) / numTilesY;
@@ -220,9 +222,9 @@ public class PuzzleView extends View {
     }
 
     public void scramblePuzzle() {
-        int N = (int) (100 * numTilesX * numTilesY);
+        int n = (int) (NUM_GRID_SCRAMBLES * numTilesX * numTilesY);
         int move = -1;
-        for (int i = 0; i < N; i++) {
+        for (int i = 0; i < n; i++) {
             move = getRandomScrambleMove(move);
 
             while (!isScrambleMoveValid(move)) {
@@ -285,7 +287,7 @@ public class PuzzleView extends View {
 
         while (lastMove == moves[randomI][randomJ]) {
             randomI = random.nextInt(moves[0].length);
-            randomJ = random.nextInt(moves[0].length);
+            randomJ = random.nextInt(moves[1].length);
         }
 
         return moves[randomI][randomJ];
