@@ -9,9 +9,13 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Random;
+import java.util.TimeZone;
 
 public class PuzzleView extends View {
     protected static final int MOVE_UP = 0;
@@ -42,32 +46,64 @@ public class PuzzleView extends View {
     private float firstY = -1f;
     private boolean tileIsOutOfPlace;
     PuzzleGrid myPuzzleGrid;
+    private int moveCount;
+    private int offset;
+    private PuzzleActivity puzzleActivity;
+    protected PuzzleGameDao puzzleGameDao;
+    protected PuzzleGame puzzleGame;
+    private ArrayList<Integer> solveMoves;
 
-    public PuzzleView(Context context, int displayWidth, int displayHeight, Resources.Theme theme) {
+    public PuzzleView(Context context, int displayWidth, int displayHeight, Resources.Theme theme, int offset,
+                      PuzzleActivity puzzleActivity, PuzzleGameDao puzzleGameDao, PuzzleGame puzzleGame, boolean resumePreviousGame) {
         super(context);
 
+        this.puzzleGameDao = puzzleGameDao;
+        this.puzzleGame = puzzleGame;
+
+        this.puzzleActivity = puzzleActivity;
+        this.offset = offset;
         this.theme = theme;
         this.displayWidth = displayWidth;
         this.displayHeight = displayHeight;
+
+        if (resumePreviousGame) {
+            solveMoves = puzzleGame.solveMoves;
+            moveCount = puzzleGame.moveCount;
+        }
+        else {
+            solveMoves = new ArrayList<>();
+            puzzleGame.solveMoves = solveMoves;
+            moveCount = 0;
+        }
+        puzzleActivity.updateMoveCount(moveCount);
+
+
         numTilesY = 6;
         numTilesX = 4;
-
 
         tileWidth = displayWidth * (1 - 2 * PuzzleBorder.BORDER_PERCENT) / numTilesX;
         tileHeight = displayHeight * (1 - 2 * PuzzleBorder.BORDER_PERCENT) / numTilesY;
 
         tileSpacer = 0;
-        puzzleBorder = new PuzzleBorder(displayWidth, displayHeight);
+        puzzleBorder = new PuzzleBorder(displayWidth, displayHeight, offset);
 
         gridCoords = new float[(int)numTilesY][(int)numTilesY][];
         myPuzzleGrid = new PuzzleGrid((int)numTilesX, (int)numTilesY, gridCoords, tileWidth, tileHeight);
         puzzleGrid = myPuzzleGrid.puzzleGrid;
         for (int i = 0; i < puzzleGrid.length; i++) {
             for (int j = 0; j < puzzleGrid[i].length; j++) {
-                PuzzleTile currTile = new PuzzleTile(tileWidth, tileHeight, (int) (j * numTilesX + i + 1));
+
+                int tileNumber;
+                if (resumePreviousGame) {
+                    tileNumber = puzzleGame.puzzleGrid[i][j];
+                }
+                else {
+                    tileNumber = (int) (j * numTilesX + i + 1);
+                }
+                PuzzleTile currTile = new PuzzleTile(tileWidth, tileHeight, tileNumber);
 
                 Matrix matrix = new Matrix();
-                gridCoords[i][j] = new float[]{puzzleBorder.thicknessX + (i * tileWidth), puzzleBorder.thicknessY + (j * tileHeight)};
+                gridCoords[i][j] = new float[]{puzzleBorder.thicknessX + (i * tileWidth), offset + puzzleBorder.thicknessY + (j * tileHeight)};
                 currTile.setPos(gridCoords[i][j][0], gridCoords[i][j][1]);
                 matrix.preTranslate(gridCoords[i][j][0], gridCoords[i][j][1]);
                 currTile.getTilePath().transform(matrix);
@@ -80,7 +116,15 @@ public class PuzzleView extends View {
             }
         }
 
-        scramblePuzzle();
+        if (resumePreviousGame) {
+            scramblePuzzle(puzzleGame.scrambleMoves);
+        }
+        else {
+            int[] scrambleList = scramblePuzzle(null);
+            puzzleGame.scrambleMoves = scrambleList;
+            updatePuzzleGameGrid();
+            puzzleGame.dateSolvedMDY = new int[3];
+        }
     }
 
     @Override
@@ -102,8 +146,11 @@ public class PuzzleView extends View {
                 x = event.getX();
                 y = event.getY();
                 Log.d("PuzzleView.onDown()", x + "," + y);
+                if (y <= offset) {
+                    return false;
+                }
                 float innerX = x - puzzleBorder.thicknessX;
-                float innerY = y - puzzleBorder.thicknessY;
+                float innerY = y - puzzleBorder.thicknessY - offset;
 
                 if (innerX <= 0 || innerY <= 0) {
                     Log.d("PuzzleView.onDown()", "outside grid");
@@ -181,7 +228,9 @@ public class PuzzleView extends View {
         }
         Log.d("onTouchEvent()", "gridIndexX: " + gridIndexX + " gridIndexY: " + gridIndexY);
 
-        switch (myPuzzleGrid.tryToMoveTile(gridIndexX, gridIndexY, firstX, firstY, deltaX, deltaY, x, y)) {
+        int[] move = new int[1];
+        move[0] = -1;
+        switch (myPuzzleGrid.tryToMoveTile(gridIndexX, gridIndexY, firstX, firstY, deltaX, deltaY, x, y, move)) {
             case PuzzleGrid.TILE_MOVED:
                 previousX = x;
                 previousY = y;
@@ -191,11 +240,17 @@ public class PuzzleView extends View {
                 invalidate();
                 break;
             case PuzzleGrid.TILE_NEW_LOCATION:
+                puzzleActivity.updateMoveCount(++moveCount);
+                solveMoves.add(move[0]);
+
                 int[] emptyIndices = myPuzzleGrid.getPreviousEmptyIndices();
                 gridIndexX = emptyIndices[0];
                 gridIndexY = emptyIndices[1];
 
                 if (isPuzzleSolved()) {
+                    puzzleGame.isSolved = true;
+                    Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+                    puzzleGame.dateSolvedMDY = new int[] {calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.YEAR)};
                     Toast toast = Toast.makeText(getContext(), "Puzzle solved!", Toast.LENGTH_SHORT);
                     toast.show();
                 }
@@ -221,14 +276,27 @@ public class PuzzleView extends View {
         return true;
     }
 
-    public void scramblePuzzle() {
+    public int[] scramblePuzzle(int[] moves) {
         int n = (int) (NUM_GRID_SCRAMBLES * numTilesX * numTilesY);
+
+        boolean useGivenScramble = moves != null;
+        if (useGivenScramble) {
+            n = moves.length;
+        }
+
+        int[] moveList = new int[n];
         int move = -1;
         for (int i = 0; i < n; i++) {
-            move = getRandomScrambleMove(move);
 
-            while (!isScrambleMoveValid(move)) {
+            if (!useGivenScramble) {
                 move = getRandomScrambleMove(move);
+                while (!isScrambleMoveValid(move)) {
+                    move = getRandomScrambleMove(move);
+                }
+                moveList[i] = move;
+            }
+            else {
+                move = moves[i];
             }
 
             switch (move) {
@@ -246,7 +314,10 @@ public class PuzzleView extends View {
                     break;
 
             }
+
         }
+
+        return moveList;
     }
 
     public boolean isScrambleMoveValid(int move) {
@@ -291,5 +362,15 @@ public class PuzzleView extends View {
         }
 
         return moves[randomI][randomJ];
+    }
+
+    private void updatePuzzleGameGrid() {
+        int[][] tileLocations = new int[(int) numTilesX][(int) numTilesY];
+        for (int i = 0; i < numTilesX; i++) {
+            for (int j = 0; j < numTilesY; j++) {
+                tileLocations[i][j] = puzzleGrid[i][j].getNumber();
+            }
+        }
+        puzzleGame.puzzleGrid = tileLocations;
     }
 }

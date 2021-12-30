@@ -49,7 +49,7 @@ public class PuzzleGrid {
     }
 
     protected void switchMovingWithEmpty(int i, int j) {
-        Log.d("tryToMoveTile()", "tile in new location");
+        //Log.d("tryToMoveTile()", "tile in new location");
         PuzzleTile emptyTile = puzzleGrid[emptyX][emptyY];
         puzzleGrid[emptyX][emptyY] = puzzleGrid[i][j];
         puzzleGrid[i][j] = emptyTile;
@@ -132,7 +132,7 @@ public class PuzzleGrid {
         return MOVEMENT_RANGE_WITHIN;
     }
 
-    public int tryToMoveTile(int i, int j, float firstX, float firstY, float deltaX, float deltaY, float x, float y) {
+    public int tryToMoveTile(int i, int j, float firstX, float firstY, float deltaX, float deltaY, float x, float y, int[] direction) {
         if (i + 1 != emptyX && i - 1 != emptyX && j + 1 != emptyY && j - 1 != emptyY) {
             //Log.d("tryToMoveTile()", "no room to move");
             return TILE_NOT_MOVED;
@@ -162,6 +162,7 @@ public class PuzzleGrid {
                 case MOVEMENT_RANGE_OVER:
                     if (movementRange[0] == movementRangeZero) {
                         switchMovingWithEmpty(i, j);
+                        direction[0] = PuzzleView.MOVE_DOWN;
                         return TILE_NEW_LOCATION;
                     }
                     else {
@@ -171,6 +172,7 @@ public class PuzzleGrid {
                 case MOVEMENT_RANGE_UNDER:
                     if (movementRange[1] == movementRangeZero) {
                         switchMovingWithEmpty(i, j);
+                        direction[0] = PuzzleView.MOVE_UP;
                         return TILE_NEW_LOCATION;
                     }
                     else {
@@ -196,6 +198,7 @@ public class PuzzleGrid {
                 case MOVEMENT_RANGE_OVER:
                     if (movementRange[0] == movementRangeZero) {
                         switchMovingWithEmpty(i, j);
+                        direction[0] = PuzzleView.MOVE_RIGHT;
                         return TILE_NEW_LOCATION;
                     }
                     else {
@@ -205,6 +208,7 @@ public class PuzzleGrid {
                 case MOVEMENT_RANGE_UNDER:
                     if (movementRange[1] == movementRangeZero) {
                         switchMovingWithEmpty(i, j);
+                        direction[0] = PuzzleView.MOVE_LEFT;
                         return TILE_NEW_LOCATION;
                     }
                     else {

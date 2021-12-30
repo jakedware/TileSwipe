@@ -15,21 +15,21 @@ public class PuzzleBorder {
     private Path borderPath;
     private Paint borderPaint;
 
-    public PuzzleBorder(float displayWidth, float displayHeight) {
+    public PuzzleBorder(float displayWidth, float displayHeight, int offset) {
         borderPath = new Path();
         borderPath.setFillType(Path.FillType.EVEN_ODD);
 
         thicknessX = displayWidth * BORDER_PERCENT;
         thicknessY = displayHeight * BORDER_PERCENT;
 
-        RectF borderRect = new RectF(0, 0, displayWidth, displayHeight);
+        RectF borderRect = new RectF(0, offset, displayWidth, displayHeight + offset);
         borderPath.addRoundRect(borderRect, BORDER_CORNER_RX, BORDER_CORNER_RY, Path.Direction.CW);
 
         float innerLeft = (displayWidth * BORDER_PERCENT);
         float innerTop = (displayHeight * BORDER_PERCENT);
         float innerRight = displayWidth - innerLeft;
         float innerBottom = displayHeight - innerTop;
-        RectF innerRect = new RectF(innerLeft, innerTop, innerRight, innerBottom);
+        RectF innerRect = new RectF(innerLeft, innerTop + offset, innerRight, innerBottom + offset);
         borderPath.addRoundRect(innerRect, BORDER_CORNER_RX, BORDER_CORNER_RY, Path.Direction.CW);
 
         borderPaint = new Paint();

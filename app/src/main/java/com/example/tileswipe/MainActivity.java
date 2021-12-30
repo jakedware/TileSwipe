@@ -14,13 +14,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        View decorView = getWindow().getDecorView();
+        // Hide both the navigation bar and the status bar.
+        // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+        // a general rule, you should design your app to hide the status bar whenever you
+        // hide the navigation bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        //         | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        //decorView.setSystemUiVisibility(uiOptions);
+
         getSupportActionBar().hide();
 
         ConstraintLayout constraintLayout = findViewById(R.id.ConstraintLayout);
     }
 
     public void goToPuzzle(View view) {
-        Intent intent = new Intent(this,PuzzleActivity.class);
-        startActivity(intent);
+        StartPuzzleFragment startPuzzleFragment = new StartPuzzleFragment();
+        startPuzzleFragment.show(getSupportFragmentManager(), StartPuzzleFragment.TAG);
     }
+
 }
