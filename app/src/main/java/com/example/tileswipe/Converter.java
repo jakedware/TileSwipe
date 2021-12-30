@@ -85,6 +85,9 @@ public class Converter {
     public static ArrayList<Integer> stringToSolveMoves(String solveMovesString) {
         String[] solveMovesStringArr = solveMovesString.split(LIST_DELIM);
         ArrayList<Integer> solveMoves = new ArrayList<>();
+        if (solveMovesString.length() <= 0) {
+            return solveMoves;
+        }
         for (int i = 0; i < solveMovesStringArr.length; i++) {
             solveMoves.add(Integer.parseInt(solveMovesStringArr[i]));
         }

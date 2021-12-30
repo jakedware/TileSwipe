@@ -40,6 +40,11 @@ public class PuzzleGrid {
         emptyY = numY - 1;
     }
 
+    public void setEmpty(int i, int j) {
+        emptyX = i;
+        emptyY = j;
+    }
+
     private void returnTileToGridPosition(int i, int j) {
         PuzzleTile currTile = puzzleGrid[i][j];
         Matrix matrix = new Matrix();
@@ -133,7 +138,7 @@ public class PuzzleGrid {
     }
 
     public int tryToMoveTile(int i, int j, float firstX, float firstY, float deltaX, float deltaY, float x, float y, int[] direction) {
-        if (i + 1 != emptyX && i - 1 != emptyX && j + 1 != emptyY && j - 1 != emptyY) {
+        if ((i + 1 != emptyX && i - 1 != emptyX) && (j + 1 != emptyY && j - 1 != emptyY)) {
             //Log.d("tryToMoveTile()", "no room to move");
             return TILE_NOT_MOVED;
         }

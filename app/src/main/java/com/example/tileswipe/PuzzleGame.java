@@ -12,8 +12,8 @@ public class PuzzleGame {
     @ColumnInfo (name = "last_updated")
     public long lastUpdated;
 
-    @ColumnInfo(name = "seconds_elapsed")
-    public long secondsElapsed;
+    @ColumnInfo(name = "ms_elapsed")
+    public long msElapsed;
 
     @ColumnInfo(name = "move_count")
     public int moveCount;

@@ -108,8 +108,9 @@ public class PuzzleView extends View {
                 matrix.preTranslate(gridCoords[i][j][0], gridCoords[i][j][1]);
                 currTile.getTilePath().transform(matrix);
 
-                if (i == puzzleGrid.length - 1 && j == puzzleGrid[i].length - 1) {
+                if (tileNumber == numTilesX * numTilesY) {
                     currTile.setEmpty();
+                    myPuzzleGrid.setEmpty(i, j);
                 }
 
                 puzzleGrid[i][j] = currTile;
@@ -117,7 +118,8 @@ public class PuzzleView extends View {
         }
 
         if (resumePreviousGame) {
-            scramblePuzzle(puzzleGame.scrambleMoves);
+            //scramblePuzzle(puzzleGame.scrambleMoves);
+            updatePuzzleGameGrid();
         }
         else {
             int[] scrambleList = scramblePuzzle(null);
@@ -146,7 +148,7 @@ public class PuzzleView extends View {
                 x = event.getX();
                 y = event.getY();
                 Log.d("PuzzleView.onDown()", x + "," + y);
-                if (y <= offset) {
+                if (y <= offset || y >= displayHeight + offset) {
                     return false;
                 }
                 float innerX = x - puzzleBorder.thicknessX;
@@ -154,12 +156,13 @@ public class PuzzleView extends View {
 
                 if (innerX <= 0 || innerY <= 0) {
                     Log.d("PuzzleView.onDown()", "outside grid");
+                    return false;
                 }
 
                 int i = (int) (innerX / tileWidth);
                 int j = (int) (innerY / tileHeight);
 
-                if (i >= numTilesX || j >= numTilesY) {
+                if (i >= numTilesX || j >= numTilesY || i < 0 || j < 0) {
                     Log.d("PuzzleView.onDown()", "outside grid");
                     break;
                 }
@@ -191,8 +194,8 @@ public class PuzzleView extends View {
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                previousX = -1;
-                previousY = -1;
+                //previousX = -1;
+                //previousY = -1;
                 break;
         }
         return true;
@@ -205,14 +208,13 @@ public class PuzzleView extends View {
                 canvas.drawPath(currTile.getTilePath(), currTile.getTilePaint());
                 if (!currTile.isEmpty()) {
                     canvas.drawText("" + currTile.getNumber(), currTile.posX + tileWidth / 2, currTile.posY + tileHeight / 2, currTile.getTextPaint());
-                    //canvas.drawTextOnPath("" + currTile.getNumber(), currTile.getTilePath(), tileWidth / 2 , tileHeight / 2,currTile.getTextPaint());
                 }
             }
         }
     }
 
     public boolean moveTile(float x, float y) {
-        if (gridIndexX == numTilesX || gridIndexY == numTilesY) {
+        if (gridIndexX >= numTilesX || gridIndexY >= numTilesY) {
             Log.d("PuzzleView.onDown()", "outside grid");
             return false;
         }
@@ -242,6 +244,7 @@ public class PuzzleView extends View {
             case PuzzleGrid.TILE_NEW_LOCATION:
                 puzzleActivity.updateMoveCount(++moveCount);
                 solveMoves.add(move[0]);
+                updatePuzzleGameGrid();
 
                 int[] emptyIndices = myPuzzleGrid.getPreviousEmptyIndices();
                 gridIndexX = emptyIndices[0];
