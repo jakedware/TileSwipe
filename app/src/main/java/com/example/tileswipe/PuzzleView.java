@@ -67,6 +67,9 @@ public class PuzzleView extends View {
         this.displayHeight = displayHeight;
 
         if (resumePreviousGame) {
+            if (puzzleGame.isSolved) {
+                puzzleActivity.showPuzzleSolvedDialog();
+            }
             solveMoves = puzzleGame.solveMoves;
             moveCount = puzzleGame.moveCount;
         }
@@ -164,7 +167,7 @@ public class PuzzleView extends View {
 
                 if (i >= numTilesX || j >= numTilesY || i < 0 || j < 0) {
                     Log.d("PuzzleView.onDown()", "outside grid");
-                    break;
+                    return false;
                 }
 
                 previousX = x;
@@ -214,7 +217,7 @@ public class PuzzleView extends View {
     }
 
     public boolean moveTile(float x, float y) {
-        if (gridIndexX >= numTilesX || gridIndexY >= numTilesY) {
+        if (gridIndexX >= numTilesX || gridIndexY >= numTilesY || gridIndexX < 0 || gridIndexY < 0) {
             Log.d("PuzzleView.onDown()", "outside grid");
             return false;
         }
@@ -254,8 +257,11 @@ public class PuzzleView extends View {
                     puzzleGame.isSolved = true;
                     Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
                     puzzleGame.dateSolvedMDY = new int[] {calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.YEAR)};
-                    Toast toast = Toast.makeText(getContext(), "Puzzle solved!", Toast.LENGTH_SHORT);
-                    toast.show();
+
+                    //Toast toast = Toast.makeText(getContext(), "Puzzle solved!", Toast.LENGTH_SHORT);
+                    //toast.show();
+                    puzzleActivity.showPuzzleSolvedDialog();
+                    updatePuzzleGameGrid();
                 }
                 Log.d("isPuzzleSolved()", "" + isPuzzleSolved());
             case PuzzleGrid.TILE_OLD_LOCATION:

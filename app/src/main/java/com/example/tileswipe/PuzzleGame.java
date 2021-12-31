@@ -32,5 +32,10 @@ public class PuzzleGame {
 
     @ColumnInfo(name = "puzzle_grid")
     public int[][] puzzleGrid;
+
+    @Ignore
+    public static String getTimeString(Long msElapsed) {
+        return msElapsed / 1000 / 60 + ":" + (msElapsed / 1000) % 60;
+    }
 }
 

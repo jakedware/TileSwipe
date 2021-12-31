@@ -16,6 +16,9 @@ public interface PuzzleGameDao {
     @Query("SELECT * FROM PuzzleGame")
     List<PuzzleGame> getAll();
 
+    @Query("SELECT * FROM PuzzleGame WHERE is_solved = 1")
+    List<PuzzleGame> getAllSolved();
+
     @Query("SELECT * FROM PuzzleGame WHERE uid IN (:userIds)")
     List<PuzzleGame> getGamesWithIds(int[] userIds);
 
@@ -30,6 +33,9 @@ public interface PuzzleGameDao {
 
     @Query("SELECT * FROM PuzzleGame ORDER BY last_updated DESC")
     List<PuzzleGame> getMostRecentGames();
+
+    @Query("SELECT * FROM PuzzleGame ORDER BY uid DESC")
+    List<PuzzleGame> getHighestId();
 
     @Insert
     void insertGames(PuzzleGame... puzzleGames);

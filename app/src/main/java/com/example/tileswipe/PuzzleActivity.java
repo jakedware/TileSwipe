@@ -5,31 +5,27 @@ import androidx.activity.OnBackPressedDispatcher;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
 import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.DataSetObserver;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +33,7 @@ import java.util.List;
 
 public class PuzzleActivity extends AppCompatActivity {
     private static final float TEXT_VIEW_PERCENT = 0.05f;
+    public static final String RESUME_GAME_INTENT_KEY = "resume-previous-game";
     protected Chronometer chronometer;
     protected ConstraintLayout constraintLayout;
     protected DisplayMetrics displayMetrics;
@@ -47,10 +44,11 @@ public class PuzzleActivity extends AppCompatActivity {
     protected TextView moveView;
     protected int moveCount;
     protected PuzzleGameDao puzzleGameDao;
-    protected long secondsElapsed = -1;
+    protected long msElapsed = -1;
     protected PuzzleGame puzzleGame;
     protected int offset;
-    enum GameRetrievalOptions {GET_ALL, GET_SPECIFIC, GET_FASTEST, GET_FEWEST_MOVES, GET_MOST_RECENT};
+    enum GameRetrievalOptions {GET_ALL, GET_SPECIFIC, GET_FASTEST, GET_FEWEST_MOVES, GET_MOST_RECENT, GET_HIGHEST_ID};
+    private boolean resumePreviousGame;
 
 
     @Override
@@ -60,11 +58,11 @@ public class PuzzleActivity extends AppCompatActivity {
         Context thisContext = this;
 
         Intent intent = getIntent();
-        boolean resumePreviousGame = intent.getBooleanExtra("resume-previous-game", false);
+        resumePreviousGame = intent.getBooleanExtra(RESUME_GAME_INTENT_KEY, false);
 
-        PuzzleGameDatabase db = Room.databaseBuilder(this, PuzzleGameDatabase.class, "puzzle-game-database").build();
-        //PuzzleGameDatabase db = Room.databaseBuilder(this, PuzzleGameDatabase.class, "puzzle-game-database").allowMainThreadQueries().build();
+        PuzzleGameDatabase db = PuzzleGameDatabase.getInstance(this);
         puzzleGameDao = db.puzzleGameDao();
+
         //puzzleGameDao.clearTable();
 
         View decorView = getWindow().getDecorView();
@@ -89,7 +87,7 @@ public class PuzzleActivity extends AppCompatActivity {
         offset = (int)(displayMetrics.heightPixels * TEXT_VIEW_PERCENT);
 
         LinearLayout topInfoBarLinearLayout = findViewById(R.id.puzzle_activity_linear_layout);
-        Button backButton = findViewById(R.id.puzzle_activity_back_button);
+        ImageButton backButton = findViewById(R.id.puzzle_activity_back_button);
         moveView = findViewById(R.id.puzzle_activity_moves_text_view);
         chronometer = findViewById(R.id.puzzle_activity_time_text_view);
 
@@ -101,7 +99,6 @@ public class PuzzleActivity extends AppCompatActivity {
         ViewGroup.LayoutParams layoutParams = topInfoBarLinearLayout.getLayoutParams();
         layoutParams.height = offset;
 
-        backButton.setText(R.string.puzzle_activity_back_button);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,11 +116,10 @@ public class PuzzleActivity extends AppCompatActivity {
                 if (isTimerOn) {
                     //secondsElapsed++;
                 }
-                Log.d("onChronometerTick()", "time: " + secondsElapsed + "s, base: " + chronometer.getBase() + ", elapsed real time: " + SystemClock.elapsedRealtime());
+                Log.d("onChronometerTick()", "time: " + msElapsed + "ms, base: " + chronometer.getBase() + ", elapsed real time: " + SystemClock.elapsedRealtime());
             }
         });
-
-
+        chronometer.setTextColor(moveView.getTextColors().getDefaultColor());
 
         OnBackPressedDispatcher onBackPressedDispatcher = getOnBackPressedDispatcher();
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
@@ -133,18 +129,15 @@ public class PuzzleActivity extends AppCompatActivity {
         };
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback);
 
-        //GameRetrievalParameters testRetrievalParams = new GameRetrievalParameters(GameRetrievalOptions.GET_ALL, null);
-        //getPuzzleGames();
-
         if (resumePreviousGame) {
             StartPuzzleWithMostRecentGame startTask = new StartPuzzleWithMostRecentGame();
             startTask.execute((Object) null);
         }
         else {
-            puzzleGame = new PuzzleGame();
-            PuzzleView puzzleView = new PuzzleView(this, displayMetrics.widthPixels, displayMetrics.heightPixels - offset, theme, offset, this, puzzleGameDao, puzzleGame, resumePreviousGame);
-            constraintLayout.addView(puzzleView);
+            StartPuzzleWithNewGame startTask = new StartPuzzleWithNewGame();
+            startTask.execute((Object) null);
         }
+
     }
 
     protected void goBack() {
@@ -159,11 +152,21 @@ public class PuzzleActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+
         builder.setNegativeButton(R.string.back_dialog_negative_button, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
             }
         });
+
+        /*
+        builder.setNeutralButton(R.string.back_dialog_neutral_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+         */
 
         builder.setTitle(R.string.back_dialog_title);
         builder.setMessage(R.string.back_dialog_message);
@@ -182,8 +185,8 @@ public class PuzzleActivity extends AppCompatActivity {
     protected void stopTimer() {
         if (isTimerOn) {
             lastStop = SystemClock.elapsedRealtime();
-            secondsElapsed = (lastStop - chronometer.getBase()) / 1000;
-            puzzleGame.secondsElapsed = secondsElapsed;
+            msElapsed = (lastStop - chronometer.getBase());
+            puzzleGame.msElapsed = msElapsed;
             chronometer.stop();
             isTimerOn = !isTimerOn;
         }
@@ -226,59 +229,55 @@ public class PuzzleActivity extends AppCompatActivity {
             finished = false;
         }
     }
-    public class RetrievePuzzleGameFromDatabaseTask extends AsyncTask<GameRetrievalParameters, Integer, Long> {
+
+    public class StartPuzzleWithNewGame extends AsyncTask<Object, Integer, Long> {
+        int newUid = -1;
+        ArrayList<PuzzleGame> highestIds;
 
         @Override
-        protected Long doInBackground(GameRetrievalParameters... gameRetrievalParameters) {
-            for (int i = 0; i < gameRetrievalParameters.length; i++) {
-                switch (gameRetrievalParameters[i].retrievalChoice) {
-                    case GET_ALL:
-                        gameRetrievalParameters[i].retrievedGames = puzzleGameDao.getAll();
-                        break;
-                    case GET_FASTEST:
-                        gameRetrievalParameters[i].retrievedGames = puzzleGameDao.getFastestGames();
-                        break;
-                    case GET_FEWEST_MOVES:
-                        gameRetrievalParameters[i].retrievedGames = puzzleGameDao.getLowestMoveCountGames();
-                        break;
-                    case GET_SPECIFIC:
-                        gameRetrievalParameters[i].retrievedGames = puzzleGameDao.getGamesWithIds(gameRetrievalParameters[i].ids);
-                        break;
-                    case GET_MOST_RECENT:
-                        gameRetrievalParameters[i].retrievedGames = puzzleGameDao.getMostRecentGames();
-                }
+        protected Long doInBackground(Object... objects) {
+            highestIds = (ArrayList<PuzzleGame>) puzzleGameDao.getHighestId();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Long aLong) {
+            puzzleGame = new PuzzleGame();
+            if (highestIds.size() != 0) {
+                puzzleGame.uid = highestIds.get(0).uid + 1;
+            }
+            PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset, theme, offset, thisActivity, puzzleGameDao, puzzleGame, resumePreviousGame);
+            constraintLayout.addView(puzzleView);
+        }
+    }
+
+    public class StartPuzzleWithMostRecentGame extends AsyncTask<Object, Integer, Long> {
+        ArrayList<PuzzleGame> games;
+
+        @Override
+        protected Long doInBackground(Object... objects) {
+            games = (ArrayList<PuzzleGame>) puzzleGameDao.getMostRecentGames();
+            // if
+            if (games.size() == 0) {
+                games.add(new PuzzleGame());
+                resumePreviousGame = false;
+            }
+            else {
+                games = games;
             }
             return 0L;
         }
 
         @Override
         protected void onPostExecute(Long aLong) {
-            super.onPostExecute(aLong);
-        }
-    }
-
-    public class StartPuzzleWithMostRecentGame extends AsyncTask<Object, Integer, Long> {
-
-        @Override
-        protected Long doInBackground(Object... objects) {
-            puzzleGame = puzzleGameDao.getMostRecentGames().get(0);
-            return 0L;
-        }
-
-        @Override
-        protected void onPostExecute(Long aLong) {
+            puzzleGame = games.get(0);
             PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset, theme, offset, thisActivity, puzzleGameDao, puzzleGame, true);
             constraintLayout.addView(puzzleView);
-            chronometer.setBase(SystemClock.elapsedRealtime() - puzzleGame.secondsElapsed);
-            secondsElapsed = puzzleGame.secondsElapsed;
-            Log.d("onPostExecute()", "" + secondsElapsed + ", " + puzzleGame.secondsElapsed + ", " + (SystemClock.elapsedRealtime() - chronometer.getBase()));
+            chronometer.setBase(SystemClock.elapsedRealtime() - puzzleGame.msElapsed);
+            msElapsed = puzzleGame.msElapsed;
+            Log.d("onPostExecute()", "" + msElapsed + ", " + puzzleGame.msElapsed + ", " + (SystemClock.elapsedRealtime() - chronometer.getBase()));
             startTimer();
         }
-    }
-
-    protected void getPuzzleGames(GameRetrievalParameters... gameRetrievalParameters) {
-        RetrievePuzzleGameFromDatabaseTask retrieveTask = new RetrievePuzzleGameFromDatabaseTask();
-        retrieveTask.execute(gameRetrievalParameters);
     }
 
     protected boolean writePuzzleGameToDatabase() {
@@ -286,6 +285,31 @@ public class PuzzleActivity extends AppCompatActivity {
         writeTask.execute(puzzleGame);
         return true;
     }
+
+    protected void showPuzzleSolvedDialog() {
+        /*
+        PuzzleSolvedDialogFragment solvedDialog = new PuzzleSolvedDialogFragment();
+        solvedDialog.show(getSupportFragmentManager(), PuzzleSolvedDialogFragment.TAG);
+        */
+        stopTimer();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.puzzle_solved_dialog_text);
+        builder.setCancelable(false);
+        builder.setMessage("time taken: " + PuzzleGame.getTimeString(puzzleGame.msElapsed) +
+                "\nmove count: " + puzzleGame.moveCount +
+                "\ndate finished: " + (puzzleGame.dateSolvedMDY[0] + 1) + "/" + puzzleGame.dateSolvedMDY[1] + "/" + puzzleGame.dateSolvedMDY[2]);
+        builder.setPositiveButton("back to main menu", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                writePuzzleGameToDatabase();
+                dialog.dismiss();
+                finish();
+            }
+        });
+        builder.show();
+
+    }
+
 
     @Override
     protected void onPause() {

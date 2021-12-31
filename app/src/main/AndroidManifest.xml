@@ -10,10 +10,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.TileSwipe">
         <activity
-            android:name="com.example.tileswipe.PuzzleActivity"
+            android:name=".SettingsActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.tileswipe.MainActivity"
+            android:name=".PuzzleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
