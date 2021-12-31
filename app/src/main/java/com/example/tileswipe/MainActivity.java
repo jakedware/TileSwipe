@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                goToSettings();
             }
         });
 
@@ -87,6 +87,11 @@ public class MainActivity extends AppCompatActivity {
     public void startPuzzle(boolean resumePreviousGame) {
         Intent intent = new Intent(this, PuzzleActivity.class);
         intent.putExtra(PuzzleActivity.RESUME_GAME_INTENT_KEY, resumePreviousGame);
+        startActivity(intent);
+    }
+
+    private void goToSettings() {
+        Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
 

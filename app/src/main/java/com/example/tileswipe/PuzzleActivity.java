@@ -271,7 +271,7 @@ public class PuzzleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Long aLong) {
             puzzleGame = games.get(0);
-            PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset, theme, offset, thisActivity, puzzleGameDao, puzzleGame, true);
+            PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset, theme, offset, thisActivity, puzzleGameDao, puzzleGame, resumePreviousGame);
             constraintLayout.addView(puzzleView);
             chronometer.setBase(SystemClock.elapsedRealtime() - puzzleGame.msElapsed);
             msElapsed = puzzleGame.msElapsed;

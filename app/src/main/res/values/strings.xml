@@ -17,22 +17,9 @@
     <string name="puzzle_solved_dialog_text">Puzzle Solved!</string>
     <string name="puzzle_solved_dialog_time_text">time taken: </string>
     <string name="puzzle_solved_dialog_moves_text">move count: </string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_settings">SettingsActivity</string>
-
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="settings_activity_delete_database_text">Delete Solve History</string>
+    <string name="delete_database_confirmation_title">Are you sure?</string>
+    <string name="delete_database_confirmation_message">This will reset your statistics and cannot be undone.</string>
+    <string name="delete_database_confirmation_positive_button">Delete History</string>
+    <string name="delete_database_confirmation_negative_button">Cancel</string>
 </resources>
