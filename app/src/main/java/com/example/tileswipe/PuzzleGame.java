@@ -35,7 +35,16 @@ public class PuzzleGame {
 
     @Ignore
     public static String getTimeString(Long msElapsed) {
-        return msElapsed / 1000 / 60 + ":" + (msElapsed / 1000) % 60;
+        long min = msElapsed / 1000 / 60;
+
+        long sec = (msElapsed / 1000) % 60;
+        String secString = "";
+        if (sec <= 9) {
+            secString += "0";
+        }
+        secString += min;
+
+        return min + ":" + secString;
     }
 }
 

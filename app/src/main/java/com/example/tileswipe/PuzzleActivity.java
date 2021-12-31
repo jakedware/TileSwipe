@@ -248,6 +248,7 @@ public class PuzzleActivity extends AppCompatActivity {
             }
             PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset, theme, offset, thisActivity, puzzleGameDao, puzzleGame, resumePreviousGame);
             constraintLayout.addView(puzzleView);
+            startTimer();
         }
     }
 
@@ -276,7 +277,10 @@ public class PuzzleActivity extends AppCompatActivity {
             chronometer.setBase(SystemClock.elapsedRealtime() - puzzleGame.msElapsed);
             msElapsed = puzzleGame.msElapsed;
             Log.d("onPostExecute()", "" + msElapsed + ", " + puzzleGame.msElapsed + ", " + (SystemClock.elapsedRealtime() - chronometer.getBase()));
-            startTimer();
+
+            if (!puzzleGame.isSolved) {
+                startTimer();
+            }
         }
     }
 
@@ -320,7 +324,7 @@ public class PuzzleActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        startTimer();
+        //startTimer();
         super.onResume();
     }
 
