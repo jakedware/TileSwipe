@@ -13,6 +13,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -23,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -49,6 +52,8 @@ public class PuzzleActivity extends AppCompatActivity {
     protected int offset;
     enum GameRetrievalOptions {GET_ALL, GET_SPECIFIC, GET_FASTEST, GET_FEWEST_MOVES, GET_MOST_RECENT, GET_HIGHEST_ID};
     private boolean resumePreviousGame;
+    private Bitmap bitmap;
+    private ImageButton viewImageButton;
 
 
     @Override
@@ -63,7 +68,8 @@ public class PuzzleActivity extends AppCompatActivity {
         PuzzleGameDatabase db = PuzzleGameDatabase.getInstance(this);
         puzzleGameDao = db.puzzleGameDao();
 
-        //puzzleGameDao.clearTable();
+        bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.sun_flower);
+
 
         View decorView = getWindow().getDecorView();
         // Hide both the navigation bar and the status bar.
@@ -88,6 +94,7 @@ public class PuzzleActivity extends AppCompatActivity {
 
         LinearLayout topInfoBarLinearLayout = findViewById(R.id.puzzle_activity_linear_layout);
         ImageButton backButton = findViewById(R.id.puzzle_activity_back_button);
+        viewImageButton = findViewById(R.id.puzzle_activity_show_image_button);
         moveView = findViewById(R.id.puzzle_activity_moves_text_view);
         chronometer = findViewById(R.id.puzzle_activity_time_text_view);
 
@@ -103,6 +110,13 @@ public class PuzzleActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 goBack();
+            }
+        });
+
+        viewImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showImage();
             }
         });
 
@@ -171,6 +185,16 @@ public class PuzzleActivity extends AppCompatActivity {
         builder.setTitle(R.string.back_dialog_title);
         builder.setMessage(R.string.back_dialog_message);
 
+        builder.show();
+    }
+
+    private void showImage() {
+        ImageView imageView = new ImageView(this);
+        imageView.setImageBitmap(bitmap);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(imageView);
+        builder.setCancelable(true);
         builder.show();
     }
 
@@ -246,7 +270,8 @@ public class PuzzleActivity extends AppCompatActivity {
             if (highestIds.size() != 0) {
                 puzzleGame.uid = highestIds.get(0).uid + 1;
             }
-            PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset, theme, offset, thisActivity, puzzleGameDao, puzzleGame, resumePreviousGame);
+            PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset,
+                    theme, offset, thisActivity, puzzleGameDao, puzzleGame, resumePreviousGame, bitmap);
             constraintLayout.addView(puzzleView);
             startTimer();
         }
@@ -272,7 +297,8 @@ public class PuzzleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Long aLong) {
             puzzleGame = games.get(0);
-            PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset, theme, offset, thisActivity, puzzleGameDao, puzzleGame, resumePreviousGame);
+            PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset,
+                    theme, offset, thisActivity, puzzleGameDao, puzzleGame, resumePreviousGame, bitmap);
             constraintLayout.addView(puzzleView);
             chronometer.setBase(SystemClock.elapsedRealtime() - puzzleGame.msElapsed);
             msElapsed = puzzleGame.msElapsed;

@@ -42,7 +42,7 @@ public class PuzzleGame {
         if (sec <= 9) {
             secString += "0";
         }
-        secString += min;
+        secString += sec;
 
         return min + ":" + secString;
     }

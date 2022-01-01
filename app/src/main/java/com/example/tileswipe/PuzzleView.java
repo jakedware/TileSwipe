@@ -2,8 +2,15 @@ package com.example.tileswipe;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Path;
+import android.graphics.Picture;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.os.Build;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -52,10 +59,13 @@ public class PuzzleView extends View {
     protected PuzzleGameDao puzzleGameDao;
     protected PuzzleGame puzzleGame;
     private ArrayList<Integer> solveMoves;
+    private Bitmap bitmap;
 
     public PuzzleView(Context context, int displayWidth, int displayHeight, Resources.Theme theme, int offset,
-                      PuzzleActivity puzzleActivity, PuzzleGameDao puzzleGameDao, PuzzleGame puzzleGame, boolean resumePreviousGame) {
+                      PuzzleActivity puzzleActivity, PuzzleGameDao puzzleGameDao, PuzzleGame puzzleGame, boolean resumePreviousGame, Bitmap bitmap) {
         super(context);
+
+        this.bitmap = bitmap;
 
         this.puzzleGameDao = puzzleGameDao;
         this.puzzleGame = puzzleGame;
@@ -103,7 +113,7 @@ public class PuzzleView extends View {
                 else {
                     tileNumber = (int) (j * numTilesX + i + 1);
                 }
-                PuzzleTile currTile = new PuzzleTile(tileWidth, tileHeight, tileNumber);
+                PuzzleTile currTile = new PuzzleTile(tileWidth, tileHeight, tileNumber, numTilesX, numTilesY, bitmap);
 
                 Matrix matrix = new Matrix();
                 gridCoords[i][j] = new float[]{puzzleBorder.thicknessX + (i * tileWidth), offset + puzzleBorder.thicknessY + (j * tileHeight)};
@@ -126,6 +136,7 @@ public class PuzzleView extends View {
         }
         else {
             int[] scrambleList = scramblePuzzle(null);
+            //int[] scrambleList = new int[100];
             puzzleGame.scrambleMoves = scrambleList;
             updatePuzzleGameGrid();
             puzzleGame.dateSolvedMDY = new int[3];
@@ -135,7 +146,22 @@ public class PuzzleView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         canvas.drawPath(puzzleBorder.getBorderPath(), puzzleBorder.getBorderPaint());
-        drawTiles(canvas);
+        if (!isPuzzleSolved()) {
+            drawTiles(canvas);
+        }
+        else {
+            //drawImage(canvas);
+            drawTiles(canvas);
+        }
+    }
+
+    public void drawImage(Canvas canvas) {
+        canvas.save();
+
+        canvas.clipPath(puzzleBorder.getInnerPath());
+        canvas.drawBitmap(bitmap, null, puzzleBorder.getOuterRect(), null);
+
+        canvas.restore();
     }
 
     @Override
@@ -208,9 +234,22 @@ public class PuzzleView extends View {
         for (int i = 0; i < puzzleGrid.length; i++) {
             for(int j = 0; j < puzzleGrid[i].length; j++) {
                 PuzzleTile currTile = puzzleGrid[i][j];
-                canvas.drawPath(currTile.getTilePath(), currTile.getTilePaint());
-                if (!currTile.isEmpty()) {
-                    canvas.drawText("" + currTile.getNumber(), currTile.posX + tileWidth / 2, currTile.posY + tileHeight / 2, currTile.getTextPaint());
+                if (!currTile.isEmpty() || isPuzzleSolved()) {
+
+                    if (bitmap != null) {
+                        canvas.save();
+                        canvas.clipPath(currTile.getClipPath());
+                        canvas.drawBitmap(bitmap, currTile.getSrcRect(), currTile.getDstRect(), currTile.getTilePaint());
+                        canvas.restore();
+
+                        if (!isPuzzleSolved()) {
+                            canvas.drawText("" + currTile.getNumber(), currTile.posX + tileWidth / 4, currTile.posY + tileHeight / 4, currTile.getTextPaint());
+                        }
+                    }
+                    else {
+                        canvas.drawPath(currTile.getTilePath(), currTile.getTilePaint());
+                        canvas.drawText("" + currTile.getNumber(), currTile.posX + tileWidth / 2, currTile.posY + tileHeight / 2, currTile.getTextPaint());
+                    }
                 }
             }
         }
