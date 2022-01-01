@@ -68,7 +68,8 @@ public class PuzzleActivity extends AppCompatActivity {
         PuzzleGameDatabase db = PuzzleGameDatabase.getInstance(this);
         puzzleGameDao = db.puzzleGameDao();
 
-        bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.sun_flower);
+        //bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.sun_flower);
+        bitmap = null;
 
 
         View decorView = getWindow().getDecorView();
