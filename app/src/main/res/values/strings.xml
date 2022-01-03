@@ -1,3 +1,25 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Tile Swipe</string>
+    <string name="main_activity_new_game_button">Start New Game</string>
+    <string name="main_activity_resume_game_button">Resume Last Game</string>
+    <string name="main_activity_stats_button">Statistics</string>
+    <string name="main_activity_settings_button">Settings</string>
+    <string name="back_dialog_positive_button">go back</string>
+    <string name="back_dialog_negative_button">cancel</string>
+    <string name="back_dialog_neutral_button">cancel</string>
+    <string name="back_dialog_title">Are you sure you want to go back?</string>
+    <string name="back_dialog_message">Progress will be saved.</string>
+    <string name="puzzle_activity_back_button">back</string>
+    <string name="puzzle_activity_time_text">time: </string>
+    <string name="puzzle_activity_move_text">moves: </string>
+    <string name="puzzle_start_new_game_button_text">Start new game</string>
+    <string name="puzzle_start_resume_game_button_text">Resume previous game</string>
+    <string name="puzzle_solved_dialog_text">Puzzle Solved!</string>
+    <string name="puzzle_solved_dialog_time_text">time taken: </string>
+    <string name="puzzle_solved_dialog_moves_text">move count: </string>
+    <string name="settings_activity_delete_database_text">Delete Solve History</string>
+    <string name="delete_database_confirmation_title">Are you sure?</string>
+    <string name="delete_database_confirmation_message">This will reset your statistics and cannot be undone.</string>
+    <string name="delete_database_confirmation_positive_button">Delete History</string>
+    <string name="delete_database_confirmation_negative_button">Cancel</string>
 </resources>

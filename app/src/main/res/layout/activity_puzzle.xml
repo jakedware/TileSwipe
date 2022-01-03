@@ -5,7 +5,47 @@
     android:id="@+id/PuzzleViewConstraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:onClick="goToPuzzle"
     tools:context=".PuzzleActivity">
 
+    <LinearLayout
+        android:id="@+id/puzzle_activity_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="1dp">
+
+        <ImageButton
+            android:id="@+id/puzzle_activity_back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            app:srcCompat="@drawable/ic_baseline_keyboard_backspace_24" />
+
+        <Chronometer
+            android:id="@+id/puzzle_activity_time_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="TextView"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/puzzle_activity_moves_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="TextView"
+            android:textAlignment="center" />
+
+        <ImageButton
+            android:id="@+id/puzzle_activity_show_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            app:srcCompat="@drawable/ic_baseline_image_24" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

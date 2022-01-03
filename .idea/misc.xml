@@ -5,6 +5,14 @@
       <map>
         <entry key="..\:/Users/inter/AndroidStudioProjects/MyApplication/app/src/main/res/layout/activity_main.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/inter/AndroidStudioProjects/MyApplication/app/src/main/res/layout/activity_puzzle.xml" value="0.5401041666666667" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/layout/activity_puzzle.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/layout/activity_settings.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/layout/activity_statistics.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_puzzle_solved_dialog.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/layout/fragment_start_puzzle.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/layout/puzzle_solved_dialog.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/xml/root_preferences.xml" value="0.35104166666666664" />
       </map>
     </option>
   </component>
