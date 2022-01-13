@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="puzzle_border_color">#FF000000</color>
     <color name="tile_background_color">#FFFFFFFF</color>
+    <color name="settings_category_divider_color">#FF000000</color>
 </resources>

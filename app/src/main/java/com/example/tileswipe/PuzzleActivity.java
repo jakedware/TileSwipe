@@ -1,5 +1,7 @@
 package com.example.tileswipe;
 
+import static com.example.tileswipe.SettingsActivity.calculateInSampleSize;
+
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.OnBackPressedDispatcher;
 import androidx.appcompat.app.AlertDialog;
@@ -11,13 +13,16 @@ import androidx.room.RoomDatabase;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -30,12 +35,15 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class PuzzleActivity extends AppCompatActivity {
-    private static final float TEXT_VIEW_PERCENT = 0.05f;
+    protected static final float TEXT_VIEW_PERCENT = 0.05f;
     public static final String RESUME_GAME_INTENT_KEY = "resume-previous-game";
     protected Chronometer chronometer;
     protected ConstraintLayout constraintLayout;
@@ -68,8 +76,26 @@ public class PuzzleActivity extends AppCompatActivity {
         PuzzleGameDatabase db = PuzzleGameDatabase.getInstance(this);
         puzzleGameDao = db.puzzleGameDao();
 
-        //bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.sun_flower);
-        bitmap = null;
+        displayMetrics = this.getResources().getDisplayMetrics();
+        Log.d("DisplayMetrics", displayMetrics.heightPixels + "x" + displayMetrics.widthPixels);
+        offset = (int)(displayMetrics.heightPixels * TEXT_VIEW_PERCENT);
+
+        String filePath = getFilesDir().getPath() + "/" + getString(R.string.custom_image_file_name);
+
+        // make sure bitmap isn't absurdly large
+        // from developer.android.com
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        bitmap = BitmapFactory.decodeFile(filePath, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, displayMetrics.widthPixels, displayMetrics.heightPixels - offset);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        bitmap = BitmapFactory.decodeFile(filePath, options);
+        // end from developer.android.com
 
 
         View decorView = getWindow().getDecorView();
@@ -86,12 +112,9 @@ public class PuzzleActivity extends AppCompatActivity {
         thisActivity = this;
         this.theme = getTheme();
 
-        displayMetrics = this.getResources().getDisplayMetrics();
-        Log.d("DisplayMetrics", displayMetrics.heightPixels + "x" + displayMetrics.widthPixels);
 
         constraintLayout = findViewById(R.id.PuzzleViewConstraintLayout);
 
-        offset = (int)(displayMetrics.heightPixels * TEXT_VIEW_PERCENT);
 
         LinearLayout topInfoBarLinearLayout = findViewById(R.id.puzzle_activity_linear_layout);
         ImageButton backButton = findViewById(R.id.puzzle_activity_back_button);
@@ -367,4 +390,5 @@ public class PuzzleActivity extends AppCompatActivity {
         startTimer();
         super.onRestart();
     }
+
 }
