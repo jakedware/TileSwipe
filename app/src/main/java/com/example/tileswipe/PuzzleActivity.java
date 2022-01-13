@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -137,12 +138,16 @@ public class PuzzleActivity extends AppCompatActivity {
             }
         });
 
+
         viewImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showImage();
             }
         });
+        if (bitmap == null) {
+            //viewImageButton.setClickable(false);
+        }
 
         lastStop = SystemClock.elapsedRealtime();
         final int[] tickCount = {0};
@@ -213,6 +218,13 @@ public class PuzzleActivity extends AppCompatActivity {
     }
 
     private void showImage() {
+        if (bitmap == null) {
+            Toast toast = new Toast(this);
+            toast.setText(R.string.puzzle_activity_show_image_not_available_text);
+            toast.show();
+            return;
+        }
+
         ImageView imageView = new ImageView(this);
         imageView.setImageBitmap(bitmap);
 
