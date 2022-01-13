@@ -22,4 +22,16 @@
     <string name="delete_database_confirmation_message">This will reset your statistics and cannot be undone.</string>
     <string name="delete_database_confirmation_positive_button">Delete History</string>
     <string name="delete_database_confirmation_negative_button">Cancel</string>
+    <string name="set_custom_image_text">Set Custom Image</string>
+    <string name="set_custom_image_error_text">Read external storage permission needed</string>
+    <string name="shared_preferences_key">com.example.tileswipe</string>
+    <string name="custom_image_file_path">.</string>
+    <string name="custom_image_file_name">user_image.png</string>
+    <string name="settings_appearance_category_text">appearance</string>
+    <string name="settings_general_category_text">general</string>
+    <string name="settings_activity_remove_custom_image_text">Remove Custom Image</string>
+    <string name="remove_custom_image_confirmation_title">Are you sure?</string>
+    <string name="remove_custom_image_confirmation_positive_button">remove</string>
+    <string name="remove_custom_image_confirmation_negative_button">cancel</string>
+    <string name="remove_custom_image_confirmation_message">This will remove your custom image from the puzzle board.</string>
 </resources>
