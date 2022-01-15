@@ -162,6 +162,31 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/change_puzzle_board_colors_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/change_puzzle_board_colors_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/change_puzzle_board_colors_text"
+                    android:textAlignment="center"
+                    android:textSize="20sp" />
+
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_baseline_color_lens_24" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>

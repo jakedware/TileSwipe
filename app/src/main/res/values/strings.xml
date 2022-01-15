@@ -35,4 +35,10 @@
     <string name="remove_custom_image_confirmation_negative_button">cancel</string>
     <string name="remove_custom_image_confirmation_message">This will remove your custom image from the puzzle board.</string>
     <string name="puzzle_activity_show_image_not_available_text">Cannot show image as a custom image is not set.</string>
+    <string name="change_puzzle_board_colors_text">Change Puzzle Board Colors</string>
+    <string name="change_puzzle_border_color_text">border color:</string>
+    <string name="change_tile_color_text">tile color:</string>
+    <string name="change_number_color_text">number color:</string>
+    <string name="color_picker_positive_button_text">confirm</string>
+    <string name="color_picker_negative_button_text">cancel</string>
 </resources>

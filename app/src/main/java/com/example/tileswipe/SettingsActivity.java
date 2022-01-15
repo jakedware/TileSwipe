@@ -43,6 +43,7 @@ public class SettingsActivity extends AppCompatActivity {
     LinearLayout deleteSolveHistoryLayout;
     LinearLayout setCustomImageLayout;
     LinearLayout removeCustomImageLayout;
+    LinearLayout changePuzzleBoardColorsLayout;
     SettingsActivity thisActivity = this;
 
     // custom image upload from user
@@ -191,6 +192,14 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
         });
+
+        changePuzzleBoardColorsLayout = findViewById(R.id.change_puzzle_board_colors_layout);
+        changePuzzleBoardColorsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToChangePuzzleBoardColorsActivity();
+            }
+        });
     }
 
     @Override
@@ -214,6 +223,11 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void getImage() {
         galleryResult.launch("");
+    }
+
+    public void goToChangePuzzleBoardColorsActivity() {
+        Intent intent = new Intent(this, ChangePuzzleBoardColorsActivity.class);
+        startActivity(intent);
     }
 
     @Override
