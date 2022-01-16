@@ -1,10 +1,12 @@
 package com.example.tileswipe;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.Picture;
@@ -61,8 +63,7 @@ public class PuzzleView extends View {
     private ArrayList<Integer> solveMoves;
     private Bitmap bitmap;
 
-    public PuzzleView(Context context, int displayWidth, int displayHeight, Resources.Theme theme, int offset,
-                      PuzzleActivity puzzleActivity, PuzzleGameDao puzzleGameDao, PuzzleGame puzzleGame, boolean resumePreviousGame, Bitmap bitmap) {
+    public PuzzleView(Context context, int displayWidth, int displayHeight, Resources.Theme theme, int offset, PuzzleGameDao puzzleGameDao, PuzzleGame puzzleGame, boolean resumePreviousGame, Bitmap bitmap) {
         super(context);
 
         this.bitmap = bitmap;
@@ -70,7 +71,7 @@ public class PuzzleView extends View {
         this.puzzleGameDao = puzzleGameDao;
         this.puzzleGame = puzzleGame;
 
-        this.puzzleActivity = puzzleActivity;
+        this.puzzleActivity = (PuzzleActivity) context;
         this.offset = offset;
         this.theme = theme;
         this.displayWidth = displayWidth;
@@ -98,8 +99,16 @@ public class PuzzleView extends View {
         tileHeight = displayHeight * (1 - 2 * PuzzleBorder.BORDER_PERCENT) / numTilesY;
 
         tileSpacer = 0;
-        puzzleBorder = new PuzzleBorder(displayWidth, displayHeight, offset);
 
+        SharedPreferences preferences = context.getSharedPreferences(ChangePuzzleBoardColorsActivity.COLOR_SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+
+        String borderColor = preferences.getString(PuzzleBorder.BORDER_COLOR_KEY, Color.BLACK + "");
+        puzzleBorder = new PuzzleBorder(displayWidth, displayHeight, offset, Integer.parseInt(borderColor));
+
+        String tileColorString = preferences.getString(PuzzleTile.TILE_COLOR_KEY, Color.GRAY + "");
+        String numberColorString = preferences.getString(PuzzleTile.NUMBER_COLOR_KEY, Color.BLACK + "");
+        int tileColor = Integer.parseInt(tileColorString);
+        int numberColor = Integer.parseInt(numberColorString);
         gridCoords = new float[(int)numTilesY][(int)numTilesY][];
         myPuzzleGrid = new PuzzleGrid((int)numTilesX, (int)numTilesY, gridCoords, tileWidth, tileHeight);
         puzzleGrid = myPuzzleGrid.puzzleGrid;
@@ -113,7 +122,7 @@ public class PuzzleView extends View {
                 else {
                     tileNumber = (int) (j * numTilesX + i + 1);
                 }
-                PuzzleTile currTile = new PuzzleTile(tileWidth, tileHeight, tileNumber, numTilesX, numTilesY, bitmap);
+                PuzzleTile currTile = new PuzzleTile(tileWidth, tileHeight, tileNumber, numTilesX, numTilesY, bitmap, tileColor, numberColor);
 
                 Matrix matrix = new Matrix();
                 gridCoords[i][j] = new float[]{puzzleBorder.thicknessX + (i * tileWidth), offset + puzzleBorder.thicknessY + (j * tileHeight)};

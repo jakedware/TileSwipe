@@ -5,7 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -14,8 +17,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String ARE_COLORS_SET_KEY = "are_colors_set_key";
     private final float BUTTON_WIDTH_PADDING_PERCENT = 0.15f;
     MainActivity thisActivity;
     ConstraintLayout constraintLayout;
@@ -82,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         buttonLayout.setPadding((int) (displayMetrics.widthPixels * BUTTON_WIDTH_PADDING_PERCENT), 0, (int)(displayMetrics.widthPixels * BUTTON_WIDTH_PADDING_PERCENT), 0);
 
+        if (!areColorsSet()) {
+            setDefaultColors();
+        }
+
     }
 
     public void startPuzzle(boolean resumePreviousGame) {
@@ -93,6 +102,38 @@ public class MainActivity extends AppCompatActivity {
     private void goToSettings() {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
+    }
+
+    public boolean areColorsSet() {
+        SharedPreferences preferences = getSharedPreferences(ChangePuzzleBoardColorsActivity.COLOR_SHARED_PREFERENCES_KEY, MODE_PRIVATE);
+        return preferences.getBoolean(ARE_COLORS_SET_KEY, false);
+    }
+
+    public void setDefaultColors() {
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        int borderColor = Color.BLACK;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            borderColor = getColor(R.color.puzzle_border_color);
+        }
+
+        int tileColor = Color.GRAY;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            tileColor = getColor(R.color.tile_color);
+        }
+
+        int numberColor = Color.BLACK;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            numberColor = getColor(R.color.number_color);
+        }
+
+        editor.putString(PuzzleBorder.BORDER_COLOR_KEY, "" + borderColor);
+        editor.putString(PuzzleTile.TILE_COLOR_KEY, "" + tileColor);
+        editor.putString(PuzzleTile.NUMBER_COLOR_KEY, "" + numberColor);
+        editor.putBoolean(ARE_COLORS_SET_KEY, true);
+
+        editor.apply();
     }
 
     private class ShowStatistics extends AsyncTask<PuzzleGameDao, Integer, Long> {

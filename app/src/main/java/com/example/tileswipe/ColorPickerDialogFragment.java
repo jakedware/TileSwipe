@@ -28,8 +28,8 @@ import org.w3c.dom.Text;
 
 public class ColorPickerDialogFragment extends DialogFragment {
     public interface ColorPickerListener {
-        public void onARGBChange(int[] argb);
-        public void onConfirm(int[] argb);
+        public void onARGBChange(int[] argb, String buttonTag);
+        public void onConfirm(int[] argb, String buttonTag);
     }
 
     AlertDialog dialog;
@@ -72,7 +72,7 @@ public class ColorPickerDialogFragment extends DialogFragment {
                 a = i;
                 aTextView.setText("a: " + i);
                 setARGB();
-                colorPickerListener.onARGBChange(getARGB());
+                colorPickerListener.onARGBChange(getARGB(), getTag());
             }
 
             @Override
@@ -92,7 +92,7 @@ public class ColorPickerDialogFragment extends DialogFragment {
                 r = i;
                 rTextView.setText("r: " + i);
                 setARGB();
-                colorPickerListener.onARGBChange(getARGB());
+                colorPickerListener.onARGBChange(getARGB(), getTag());
             }
 
             @Override
@@ -112,7 +112,7 @@ public class ColorPickerDialogFragment extends DialogFragment {
                 g = i;
                 gTextView.setText("g: " + i);
                 setARGB();
-                colorPickerListener.onARGBChange(getARGB());
+                colorPickerListener.onARGBChange(getARGB(), getTag());
             }
 
             @Override
@@ -132,7 +132,7 @@ public class ColorPickerDialogFragment extends DialogFragment {
                 b = i;
                 bTextView.setText("b: " + i);
                 setARGB();
-                colorPickerListener.onARGBChange(getARGB());
+                colorPickerListener.onARGBChange(getARGB(), getTag());
             }
 
             @Override
@@ -152,7 +152,7 @@ public class ColorPickerDialogFragment extends DialogFragment {
         positiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                colorPickerListener.onConfirm(getARGB());
+                colorPickerListener.onConfirm(getARGB(), getTag());
                 ColorPickerDialogFragment.this.dismiss();
             }
         });

@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import android.os.Build;
 
 public class PuzzleBorder {
+    public static final String BORDER_COLOR_KEY = "border_color_key";
     protected static final float BORDER_CORNER_RX = 50;
     protected static final float BORDER_CORNER_RY = 50;
     protected static final float BORDER_PERCENT = (float) 0.025;
@@ -18,7 +19,7 @@ public class PuzzleBorder {
     private RectF outerRect;
     private Path innerPath;
 
-    public PuzzleBorder(float displayWidth, float displayHeight, int offset) {
+    public PuzzleBorder(float displayWidth, float displayHeight, int offset, int borderColor) {
         borderPath = new Path();
         borderPath.setFillType(Path.FillType.EVEN_ODD);
 
@@ -40,7 +41,7 @@ public class PuzzleBorder {
         innerPath.addRoundRect(innerRect, BORDER_CORNER_RX, BORDER_CORNER_RY, Path.Direction.CW);
 
         borderPaint = new Paint();
-        borderPaint.setColor(Color.BLACK);
+        borderPaint.setColor(borderColor);
     }
 
     public Path getBorderPath() {

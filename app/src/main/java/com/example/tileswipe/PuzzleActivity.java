@@ -50,7 +50,6 @@ public class PuzzleActivity extends AppCompatActivity {
     protected ConstraintLayout constraintLayout;
     protected DisplayMetrics displayMetrics;
     protected Resources.Theme theme;
-    private PuzzleActivity thisActivity;
     private long lastStop;
     private boolean isTimerOn;
     protected TextView moveView;
@@ -69,7 +68,6 @@ public class PuzzleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_puzzle);
-        Context thisContext = this;
 
         Intent intent = getIntent();
         resumePreviousGame = intent.getBooleanExtra(RESUME_GAME_INTENT_KEY, false);
@@ -110,7 +108,6 @@ public class PuzzleActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
-        thisActivity = this;
         this.theme = getTheme();
 
 
@@ -306,8 +303,8 @@ public class PuzzleActivity extends AppCompatActivity {
             if (highestIds.size() != 0) {
                 puzzleGame.uid = highestIds.get(0).uid + 1;
             }
-            PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset,
-                    theme, offset, thisActivity, puzzleGameDao, puzzleGame, resumePreviousGame, bitmap);
+            PuzzleView puzzleView = new PuzzleView(PuzzleActivity.this, displayMetrics.widthPixels, displayMetrics.heightPixels - offset,
+                    theme, offset, puzzleGameDao, puzzleGame, resumePreviousGame, bitmap);
             constraintLayout.addView(puzzleView);
             startTimer();
         }
@@ -333,8 +330,8 @@ public class PuzzleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Long aLong) {
             puzzleGame = games.get(0);
-            PuzzleView puzzleView = new PuzzleView(thisActivity, displayMetrics.widthPixels, displayMetrics.heightPixels - offset,
-                    theme, offset, thisActivity, puzzleGameDao, puzzleGame, resumePreviousGame, bitmap);
+            PuzzleView puzzleView = new PuzzleView(PuzzleActivity.this, displayMetrics.widthPixels, displayMetrics.heightPixels - offset,
+                    theme, offset, puzzleGameDao, puzzleGame, resumePreviousGame, bitmap);
             constraintLayout.addView(puzzleView);
             chronometer.setBase(SystemClock.elapsedRealtime() - puzzleGame.msElapsed);
             msElapsed = puzzleGame.msElapsed;

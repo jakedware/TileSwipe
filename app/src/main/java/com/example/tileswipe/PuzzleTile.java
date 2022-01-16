@@ -1,6 +1,7 @@
 package com.example.tileswipe;
 
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -11,6 +12,8 @@ import android.graphics.RectF;
 import android.text.TextPaint;
 
 public class PuzzleTile {
+    public static final String TILE_COLOR_KEY = "tile_color_key";
+    public static final String NUMBER_COLOR_KEY = "number_color_key";
     protected static final int TILE_CORNER_RX = 50;
     protected static final int TILE_CORNER_RY = 50;
     protected static final Path.Direction TILE_DIRECTION = Path.Direction.CW;
@@ -33,19 +36,21 @@ public class PuzzleTile {
     private float numTilesX;
     private float numTilesY;
 
-    public PuzzleTile(float tileWidth, float tileHeight, int number, float numTilesX, float numTilesY, Bitmap bitmap) {
+    public PuzzleTile(float tileWidth, float tileHeight, int number, float numTilesX, float numTilesY, Bitmap bitmap, int tileColor, int numberColor) {
         TILE_NUMBER = number;
         this.numTilesX = numTilesX;
         this.numTilesY = numTilesY;
         this.bitmap = bitmap;
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
+
         tilePaint = new Paint();
-        //tilePaint.setColor(Color.WHITE);
-        tilePaint.setColor(Color.GRAY);
+        tilePaint.setColor(tileColor);
+
         textPaint = new TextPaint();
-        textPaint.setColor(Color.BLACK);
+        textPaint.setColor(numberColor);
         textPaint.setTextAlign(Paint.Align.CENTER);
+
         textSize = tileHeight / 8;
         textPaint.setTextSize(textSize);
 
