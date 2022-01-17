@@ -12,8 +12,8 @@ import android.graphics.RectF;
 import android.text.TextPaint;
 
 public class PuzzleTile {
-    public static final String TILE_COLOR_KEY = "tile_color_key";
-    public static final String NUMBER_COLOR_KEY = "number_color_key";
+    public static final String TILE_COLOR_KEY = ChangePuzzleBoardColorsActivity.ButtonType.TILE_BUTTON.name();
+    public static final String NUMBER_COLOR_KEY = ChangePuzzleBoardColorsActivity.ButtonType.NUMBER_BUTTON.name();
     protected static final int TILE_CORNER_RX = 50;
     protected static final int TILE_CORNER_RY = 50;
     protected static final Path.Direction TILE_DIRECTION = Path.Direction.CW;

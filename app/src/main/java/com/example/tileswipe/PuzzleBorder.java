@@ -7,7 +7,7 @@ import android.graphics.RectF;
 import android.os.Build;
 
 public class PuzzleBorder {
-    public static final String BORDER_COLOR_KEY = "border_color_key";
+    public static final String BORDER_COLOR_KEY = ChangePuzzleBoardColorsActivity.ButtonType.BORDER_BUTTON.name();
     protected static final float BORDER_CORNER_RX = 50;
     protected static final float BORDER_CORNER_RY = 50;
     protected static final float BORDER_PERCENT = (float) 0.025;

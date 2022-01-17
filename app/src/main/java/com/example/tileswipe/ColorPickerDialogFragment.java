@@ -3,28 +3,17 @@ package com.example.tileswipe;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
 
-import androidx.annotation.RequiresApi;
-import androidx.fragment.app.Fragment;
-
-import android.text.Layout;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import com.google.android.material.slider.RangeSlider;
-
-import org.w3c.dom.Text;
 
 public class ColorPickerDialogFragment extends DialogFragment {
     public interface ColorPickerListener {
@@ -33,7 +22,7 @@ public class ColorPickerDialogFragment extends DialogFragment {
     }
 
     AlertDialog dialog;
-    TextView color;
+    TextView colorTextView;
     int a = 255;
     int r = 255;
     int g = 255;
@@ -45,8 +34,17 @@ public class ColorPickerDialogFragment extends DialogFragment {
 
         View view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_color_picker_dialog, null);
 
-        color = view.findViewById(R.id.color_picker_dialog_color_text_view);
-        color.setBackgroundColor(Color.argb(a,r,g,b));
+        SharedPreferences preferences = requireContext().getSharedPreferences(ChangePuzzleBoardColorsActivity.COLOR_SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+        String colorString = preferences.getString(getTag(), Color.WHITE + "");
+        int color = Integer.parseInt(colorString);
+        a = Color.alpha(color);
+        r = Color.red(color);
+        g = Color.green(color);
+        b = Color.blue(color);
+
+
+        colorTextView = view.findViewById(R.id.color_picker_dialog_color_text_view);
+        colorTextView.setBackgroundColor(Color.argb(a,r,g,b));
 
         TextView aTextView = view.findViewById(R.id.a_text_view);
         aTextView.setText("a: " + a);
@@ -70,7 +68,8 @@ public class ColorPickerDialogFragment extends DialogFragment {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean bool) {
                 a = i;
-                aTextView.setText("a: " + i);
+                String aNumber = "a: " + getAlignedText(i + "");
+                aTextView.setText(aNumber);
                 setARGB();
                 colorPickerListener.onARGBChange(getARGB(), getTag());
             }
@@ -90,7 +89,8 @@ public class ColorPickerDialogFragment extends DialogFragment {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean bool) {
                 r = i;
-                rTextView.setText("r: " + i);
+                String rNumber = "r: " + getAlignedText(i + "");
+                rTextView.setText(rNumber);
                 setARGB();
                 colorPickerListener.onARGBChange(getARGB(), getTag());
             }
@@ -110,7 +110,8 @@ public class ColorPickerDialogFragment extends DialogFragment {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean bool) {
                 g = i;
-                gTextView.setText("g: " + i);
+                String rNumber = "g: " + getAlignedText(i + "");
+                gTextView.setText(rNumber);
                 setARGB();
                 colorPickerListener.onARGBChange(getARGB(), getTag());
             }
@@ -130,7 +131,8 @@ public class ColorPickerDialogFragment extends DialogFragment {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean bool) {
                 b = i;
-                bTextView.setText("b: " + i);
+                String bNumber = "b: " + getAlignedText(i + "");
+                bTextView.setText(bNumber);
                 setARGB();
                 colorPickerListener.onARGBChange(getARGB(), getTag());
             }
@@ -189,7 +191,21 @@ public class ColorPickerDialogFragment extends DialogFragment {
     }
 
     public void setARGB() {
-        color.setBackgroundColor(Color.argb(a,r,g,b));
+        colorTextView.setBackgroundColor(Color.argb(a,r,g,b));
+    }
+
+    public String getAlignedText(String number) {
+        int length = number.length();
+        Log.d("length", length + "");
+
+        switch (length) {
+            case 1:
+                return "  " + number;
+            case 2:
+                return " " + number;
+            default:
+                return number;
+        }
     }
 
 }
