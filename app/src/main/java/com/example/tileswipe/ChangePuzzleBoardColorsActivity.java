@@ -1,6 +1,5 @@
 package com.example.tileswipe;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
@@ -23,6 +22,10 @@ public class ChangePuzzleBoardColorsActivity extends AppCompatActivity implement
     Button borderButton;
     Button tileButton;
     Button numberButton;
+    Button resetBorderColorButton;
+    Button resetTileColorButton;
+    Button resetNumberColorButton;
+
     public enum ButtonType {BORDER_BUTTON, TILE_BUTTON, NUMBER_BUTTON};
 
     @Override
@@ -36,6 +39,9 @@ public class ChangePuzzleBoardColorsActivity extends AppCompatActivity implement
         tileButton = findViewById(R.id.change_tile_color_button);
         numberButton = findViewById(R.id.change_number_color_button);
 
+        resetBorderColorButton = findViewById(R.id.reset_border_color_button);
+        resetTileColorButton = findViewById(R.id.reset_tile_color_button);
+        resetNumberColorButton = findViewById(R.id.reset_number_color_button);
 
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 
@@ -63,8 +69,28 @@ public class ChangePuzzleBoardColorsActivity extends AppCompatActivity implement
             }
         });
 
-        resetColors();
-        //setInitialButtonColors();
+        resetBorderColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetBorderColor();
+            }
+        });
+
+        resetTileColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetTileColor();
+            }
+        });
+
+        resetNumberColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetNumberColor();
+            }
+        });
+
+        setCurrentButtonColors();
     }
 
     public void showColorPickerDialog(ButtonType buttonType) {
@@ -85,7 +111,7 @@ public class ChangePuzzleBoardColorsActivity extends AppCompatActivity implement
         setButtonColor(argb, buttonType);
     }
 
-    public void setInitialButtonColors() {
+    public void setCurrentButtonColors() {
         SharedPreferences preferences = getSharedPreferences(COLOR_SHARED_PREFERENCES_KEY, MODE_PRIVATE);
 
         String border = preferences.getString(PuzzleBorder.BORDER_COLOR_KEY, Color.BLACK + "");
@@ -133,7 +159,7 @@ public class ChangePuzzleBoardColorsActivity extends AppCompatActivity implement
     }
 
     public void resetColors() {
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(COLOR_SHARED_PREFERENCES_KEY, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
         int borderColor = Color.BLACK;
@@ -156,5 +182,50 @@ public class ChangePuzzleBoardColorsActivity extends AppCompatActivity implement
         editor.putString(PuzzleTile.NUMBER_COLOR_KEY, "" + numberColor);
 
         editor.apply();
+    }
+
+    public void resetBorderColor() {
+        SharedPreferences preferences = getSharedPreferences(COLOR_SHARED_PREFERENCES_KEY, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        int borderColor = Color.BLACK;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            borderColor = getColor(R.color.puzzle_border_color);
+        }
+
+        editor.putString(PuzzleBorder.BORDER_COLOR_KEY, "" + borderColor);
+        editor.apply();
+
+        setCurrentButtonColors();
+    }
+
+    public void resetTileColor() {
+        SharedPreferences preferences = getSharedPreferences(COLOR_SHARED_PREFERENCES_KEY, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        int tileColor = Color.GRAY;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            tileColor = getColor(R.color.tile_color);
+        }
+
+        editor.putString(PuzzleTile.TILE_COLOR_KEY, "" + tileColor);
+        editor.apply();
+
+        setCurrentButtonColors();
+    }
+
+    public void resetNumberColor() {
+        SharedPreferences preferences = getSharedPreferences(COLOR_SHARED_PREFERENCES_KEY, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        int numberColor = Color.BLACK;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            numberColor = getColor(R.color.number_color);
+        }
+
+        editor.putString(PuzzleTile.NUMBER_COLOR_KEY, "" + numberColor);
+        editor.apply();
+
+        setCurrentButtonColors();
     }
 }

@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setDefaultColors() {
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(ChangePuzzleBoardColorsActivity.COLOR_SHARED_PREFERENCES_KEY,MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
         int borderColor = Color.BLACK;

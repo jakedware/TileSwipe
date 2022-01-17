@@ -35,6 +35,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/reset_border_color_button"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/change_color_reset_button_text" />
         </LinearLayout>
 
         <LinearLayout
@@ -57,6 +65,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
 
+            <Button
+                android:id="@+id/reset_tile_color_button"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/change_color_reset_button_text" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -77,6 +93,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/reset_number_color_button"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/change_color_reset_button_text" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

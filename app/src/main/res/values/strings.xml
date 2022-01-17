@@ -41,4 +41,5 @@
     <string name="change_number_color_text">number color:</string>
     <string name="color_picker_positive_button_text">confirm</string>
     <string name="color_picker_negative_button_text">cancel</string>
+    <string name="change_color_reset_button_text">reset</string>
 </resources>
