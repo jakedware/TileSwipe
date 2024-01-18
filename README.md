@@ -6,5 +6,7 @@ Rearrange the tiles to form the complete image by sliding them into the empty sp
 
 ![Screenshot_20220124-181615](https://github.com/jakedware/TileSwipe/assets/55477173/d05ec8e0-9929-49e3-9f50-f169d421a601)
 
+![Screenshot_20220124-181747](https://github.com/jakedware/TileSwipe/assets/55477173/f5e29099-0509-4b5a-86d3-62f0b9bbf837)
+
 ![Screenshot_20220124-181755](https://github.com/jakedware/TileSwipe/assets/55477173/76ef79de-f80d-48da-a3b9-8d87ad9e9092)
 
